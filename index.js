@@ -1,12 +1,25 @@
 const express = require("express");
 const app = express();
 const port = process.env.PORT || 3000;
+const movieController = require('./controllers/movieController')
+const userController = require('./controllers/userController')
 
 const bodyParser = require("body-parser");
+const req = require("express/lib/request");
 app.use(bodyParser.json());
 
 let database = [];
-let id = 0;
+
+//Movie routes
+app.get('/movies', movieController.getAllMovies)
+app.get('/movieDetail/:movieId', movieController.getDetailMovie)
+app.post('/movieAdd', movieController.storeMovie)
+
+//User routes
+app.get('/users', userController.getAllusers)
+app.get('/userDetail/:userId', userController.getDetailUser)
+app.post('/userAdd', userController.storeUser)
+
 
 app.all("*", (req, res, next) => {
   const method = req.method;
@@ -21,45 +34,6 @@ app.get("/", (req, res) => {
   });
 });
 
-app.post("/api/movie", (req, res) => {
-  let movie = req.body;
-  id++;
-  movie = {
-    id,
-    ...movie,
-  };
-  console.log(movie);
-  database.push(movie);
-  res.status(201).json({
-    status: 201,
-    result: database,
-  });
-});
-
-app.get("/api/movie/:movieId", (req, res, next) => {
-  const movieId = req.params.movieId;
-  console.log(`Movie met ID ${movieId} gezocht`);
-  let movie = database.filter((item) => item.id == movieId);
-  if (movie.length > 0) {
-    console.log(movie);
-    res.status(200).json({
-      status: 200,
-      result: movie,
-    });
-  } else {
-    res.status(401).json({
-      status: 401,
-      result: `Movie with ID ${movieId} not found`,
-    });
-  }
-});
-
-app.get("/api/movie", (req, res, next) => {
-  res.status(200).json({
-    status: 200,
-    result: database,
-  });
-});
 
 app.all("*", (req, res) => {
   res.status(401).json({
