@@ -40,6 +40,49 @@ let userController = {
             });
           }
         },
+      deleteUser(req, res, next)  {
+          const userid = req.params.userId;
+          console.log(`User met ID ${userid} gezocht`);
+          let user = userDatabase.filter((item) => item.id == userid);
+          if (user.length > 0) {
+            console.log(user);
+            console.log('RIP user')
+            userDatabase.splice(user)
+            res.status(200).json({
+              status: 200,
+              result: "User deleted " + user,
+            });
+          } else {
+            res.status(401).json({
+              status: 401,
+              result: `User with ID ${userid} not found`,
+            });
+          }
+        },
+        updateUser(req, res, next)  {
+          const userid = req.params.userId;
+          let userBody = req.body;
+          console.log(`User met ID ${userid} gezocht`);
+          let user = userDatabase.filter((item) => item.id == userid);
+          if (user.length > 0) {
+            console.log(user);
+            let id = userid;
+            userBody = {
+              id,
+              ...userBody,
+            };
+            userDatabase.splice(userDatabase.indexOf(userid), 1, (userBody))
+            res.status(200).json({
+              status: 200,
+              result: "User updated",
+            });
+          } else {
+            res.status(401).json({
+              status: 401,
+              result: `User with ID ${userid} not found`,
+            });
+          }
+        },
 }
 module.exports = userController;
     

@@ -12,13 +12,17 @@ let database = [];
 
 //Movie routes
 app.get('/movies', movieController.getAllMovies)
-app.get('/movieDetail/:movieId', movieController.getDetailMovie)
-app.post('/movieAdd', movieController.storeMovie)
+app.get('/movie/:movieId', movieController.getDetailMovie)
+app.post('/movie', movieController.storeMovie)
+app.delete('/movie/:movieId', movieController.deleteMovie)
+app.put('/movie/:movieId', movieController.updateMovie)
 
 //User routes
 app.get('/users', userController.getAllusers)
-app.get('/userDetail/:userId', userController.getDetailUser)
-app.post('/userAdd', userController.storeUser)
+app.get('/user/:userId', userController.getDetailUser)
+app.post('/user', userController.storeUser)
+app.delete('/user/:userId', userController.deleteUser)
+app.put('/user/:userId', userController.updateUser)
 
 
 app.all("*", (req, res, next) => {
