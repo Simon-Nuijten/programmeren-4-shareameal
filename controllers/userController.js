@@ -16,12 +16,21 @@ let userController = {
             id,
             ...user,
           };
-          console.log(user);
+          let userEmail =  req.body.emailAdress;
+          let item = userDatabase.filter((item) => item.emailAdress == userEmail)
+          if(item.length > 0){
+            res.status(401).json({
+              status: 401,
+              result: "User allready exists",
+            });
+          } else {
+            console.log(user);
           userDatabase.push(user);
-          res.status(201).json({
-            status: 201,
-            result: userDatabase,
-          });
+            res.status(201).json({
+              status: 201,
+              result: userDatabase,
+            });
+          }  
     },
     getDetailUser(req, res, next)  {
           const userid = req.params.userId;
