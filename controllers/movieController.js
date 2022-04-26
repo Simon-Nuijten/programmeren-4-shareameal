@@ -1,11 +1,34 @@
 const express = require("express");
 const app = express();
+const assert = require('assert');
 
 
 let database = []
 let id = 0;
 let movieController = {
-
+  validateMovie:(req, res, next)=>{
+    let movie = req.body
+    let {
+      title, year, studio
+    } = movie;
+    try{
+      assert(typeof title === 'string', 'Title moet een String zijn')
+      assert(typeof year === 'number', 'Year moet een number zijn')
+      assert(typeof studio === 'string', 'Studio moet een String zijn')
+      next()
+    } catch (err){
+      const error = {
+        status: 400,
+        response: err.message
+      }
+      console.log(err)
+      res.status(400).json({
+        status: 400,
+        result: err.toString(),
+      })
+      next(error)
+    }
+  },
     getAllMovies(req, res) {
         console.log('get all called')
         res.status(200).json({
@@ -21,6 +44,7 @@ let movieController = {
             ...movie,
           };
           console.log(movie);
+
           database.push(movie);
           res.status(201).json({
             status: 201,
@@ -38,10 +62,11 @@ let movieController = {
               result: movie,
             });
           } else {
-            res.status(401).json({
-              status: 401,
-              result: `Movie with ID ${movieId} not found`,
-            });
+            const error = {
+              status: 400,
+              result: err.message
+            }
+            next(err)
           }
         },
       deleteMovie(req, res, next)  {

@@ -13,7 +13,7 @@ let database = [];
 //Movie routes
 app.get('/movies', movieController.getAllMovies)
 app.get('/movie/:movieId', movieController.getDetailMovie)
-app.post('/movie', movieController.storeMovie)
+app.post('/movie', movieController.validateMovie ,movieController.storeMovie)
 app.delete('/movie/:movieId', movieController.deleteMovie)
 app.put('/movie/:movieId', movieController.updateMovie)
 
@@ -30,6 +30,13 @@ app.all("*", (req, res, next) => {
   console.log(`Method ${method} is aangeroepen`);
   next();
 });
+
+
+//Error handeler
+app.use((err, req, res, next) =>{
+  res.status(err.status).json(err)
+})
+
 
 app.get("/", (req, res) => {
   res.status(200).json({
