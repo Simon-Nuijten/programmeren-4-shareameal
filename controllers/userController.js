@@ -1,5 +1,9 @@
+const express = require("express");
+const app = express();
+
 let userDatabase = []
 let id = 0;
+
 let userController = {
 
     getAllusers(req, res) {

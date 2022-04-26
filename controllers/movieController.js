@@ -1,3 +1,7 @@
+const express = require("express");
+const app = express();
+
+
 let database = []
 let id = 0;
 let movieController = {

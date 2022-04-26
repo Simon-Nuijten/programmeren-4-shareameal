@@ -34,7 +34,7 @@ app.all("*", (req, res, next) => {
 app.get("/", (req, res) => {
   res.status(200).json({
     status: 200,
-    result: "Hello World",
+    result: "Hello",
   });
 });
 
