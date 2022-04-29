@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+require('dotenv').config();
 const port = process.env.PORT || 3000;
 const movieController = require('./controllers/movieController')
 const userController = require('./controllers/userController')
@@ -8,7 +9,6 @@ const bodyParser = require("body-parser");
 const req = require("express/lib/request");
 app.use(bodyParser.json());
 
-let database = [];
 
 //Movie routes
 app.get('/movies', movieController.getAllMovies)
@@ -23,6 +23,10 @@ app.get('/user/:userId', userController.getDetailUser)
 app.post('/user', userController.storeUser)
 app.delete('/user/:userId', userController.deleteUser)
 app.put('/user/:userId', userController.updateUser)
+
+
+//Alle movie routes
+// app.use('/api', );
 
 
 app.all("*", (req, res, next) => {

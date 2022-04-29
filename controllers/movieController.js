@@ -1,9 +1,7 @@
 const express = require("express");
 const app = express();
 const assert = require('assert');
-
-
-let database = []
+const dbconnection = require('../../programmeren-4-shareameal/dbconnection')
 let id = 0;
 let movieController = {
   validateMovie:(req, res, next)=>{
@@ -30,11 +28,38 @@ let movieController = {
     }
   },
     getAllMovies(req, res) {
-        console.log('get all called')
-        res.status(200).json({
-            status: 200,
-            result: database,
-        })
+        // console.log('get all called')
+        // res.status(200).json({
+        //     status: 200,
+        //     result: database,
+        // })
+        dbconnection.getConnection(function (err, connection) {
+          if (err) throw err; // not connected!
+        
+          // Use the connection
+          connection.query(
+            "SELECT id, name FROM meal;",
+            function (error, results, fields) {
+              // When done with the connection, release it.
+              connection.release();
+        
+              // Handle error after the release.
+              if (error) throw error;
+        
+              // Don't use the connection here, it has been returned to the pool.
+              res.status(200).json({
+                statusCode: 300,
+                results: results
+              })
+              console.log("result = ", results);
+        
+              dbconnection.end( (err) => {
+                console.log('pool party is closed')
+              });
+            }
+          );
+        });
+        
     },
     storeMovie(req, res)  {
           let movie = req.body;
