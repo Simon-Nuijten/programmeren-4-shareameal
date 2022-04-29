@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+require('dotenv').config();
 const port = process.env.PORT || 3000;
 const movieController = require('./controllers/movieController')
 const userController = require('./controllers/userController')
@@ -8,12 +9,11 @@ const bodyParser = require("body-parser");
 const req = require("express/lib/request");
 app.use(bodyParser.json());
 
-let database = [];
 
 //Movie routes
 app.get('/movies', movieController.getAllMovies)
 app.get('/movie/:movieId', movieController.getDetailMovie)
-app.post('/movie', movieController.storeMovie)
+app.post('/movie', movieController.validateMovie ,movieController.storeMovie)
 app.delete('/movie/:movieId', movieController.deleteMovie)
 app.put('/movie/:movieId', movieController.updateMovie)
 
@@ -25,11 +25,22 @@ app.delete('/user/:userId', userController.deleteUser)
 app.put('/user/:userId', userController.updateUser)
 
 
+//Alle movie routes
+// app.use('/api', );
+
+
 app.all("*", (req, res, next) => {
   const method = req.method;
   console.log(`Method ${method} is aangeroepen`);
   next();
 });
+
+
+//Error handeler
+app.use((err, req, res, next) =>{
+  res.status(err.status).json(err)
+})
+
 
 app.get("/", (req, res) => {
   res.status(200).json({
@@ -49,3 +60,5 @@ app.all("*", (req, res) => {
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
+
+module.export = app
