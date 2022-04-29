@@ -46,7 +46,6 @@ let movieController = {
               // Handle error after the release.
               if (error) throw error;
         
-              // Don't use the connection here, it has been returned to the pool.
               res.status(200).json({
                 statusCode: 300,
                 results: results
