@@ -28,11 +28,6 @@ let movieController = {
     }
   },
     getAllMovies(req, res) {
-        // console.log('get all called')
-        // res.status(200).json({
-        //     status: 200,
-        //     result: database,
-        // })
         dbconnection.getConnection(function (err, connection) {
           if (err) throw err; // not connected!
         
@@ -45,7 +40,7 @@ let movieController = {
         
               // Handle error after the release.
               if (error) throw error;
-        
+              
               res.status(200).json({
                 statusCode: 300,
                 results: results
@@ -77,40 +72,66 @@ let movieController = {
     },
     getDetailMovie(req, res, next)  {
           const movieId = req.params.movieId;
+          dbconnection.getConnection(function (err, connection) {
+            if (err) throw err; // not connected!
+          
+            // Use the connection
+            connection.query(
+              "SELECT id, name FROM meal WHERE meal.id = " + movieId + ";",
+              function (error, results, fields) {
+                // When done with the connection, release it.
+                connection.release();
+          
+                // Handle error after the release.
+                if (error) throw error;
+                
+                res.status(200).json({
+                  statusCode: 300,
+                  results: results
+                })
+                console.log("result = ", results);
+          
+                dbconnection.end( (err) => {
+                  console.log('pool party is closed')
+                });
+              }
+            );
+          });
           console.log(`Movie met ID ${movieId} gezocht`);
-          let movie = database.filter((item) => item.id == movieId);
-          if (movie.length > 0) {
-            console.log(movie);
-            res.status(200).json({
-              status: 200,
-              result: movie,
-            });
-          } else {
-            const error = {
-              status: 400,
-              result: err.message
-            }
-            next(err)
-          }
         },
       deleteMovie(req, res, next)  {
           const movieId = req.params.movieId;
-          console.log(`Movie met ID ${movieId} gezocht`);
-          let movie = database.filter((item) => item.id == movieId);
-          if (movie.length > 0) {
-            console.log(movie);
-            console.log('RIP movie')
-            database.splice(movie)
-            res.status(200).json({
-              status: 200,
-              result: 'Movie deleted '+ movie,
-            });
-          } else {
+          console.log(`Movie met ID ${movieId} verwijdert`);
+          dbconnection.getConnection(function (err, connection) {
+            if (err) throw err; // not connected!
+          
+            // Use the connection
+            connection.query(
+              "DELETE FROM meals WHERE id = "+ movieId +";",
+              function (error, results, fields) {
+                // When done with the connection, release it.
+                connection.release();
+          
+                // Handle error after the release.
+                if (error) throw error;
+                
+                res.status(200).json({
+                  statusCode: 300,
+                  results: results
+                })
+                console.log("result = ", results);
+          
+                dbconnection.end( (err) => {
+                  console.log('pool party is closed')
+                });
+              }
+            );
+          });
+
             res.status(401).json({
               status: 401,
               result: `Movie with ID ${movieId} not found`,
             });
-          }
         },
         updateMovie(req, res, next)  {
           const moveId = req.params.movieId;
