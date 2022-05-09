@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 
-const dbconnection = require('../../programmeren-4-shareameal/dbconnection')
+const dbconnection = require('../dbconnection')
 
 let userDatabase = []
 let id = 0;
