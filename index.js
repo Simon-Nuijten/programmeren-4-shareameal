@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 require('dotenv').config();
 const port = process.env.PORT || 3000;
-const movieController = require('./controllers/movieController')
+// const movieController = require('./controllers/movieController')
 const userController = require('./controllers/userController')
 
 const bodyParser = require("body-parser");
@@ -11,11 +11,11 @@ app.use(bodyParser.json());
 
 
 //Movie routes
-app.get('/movies', movieController.getAllMovies)
-app.get('/movie/:movieId', movieController.getDetailMovie)
-app.post('/movie', movieController.validateMovie ,movieController.storeMovie)
-app.delete('/movie/:movieId', movieController.deleteMovie)
-app.put('/movie/:movieId', movieController.updateMovie)
+// app.get('/movies', movieController.getAllMovies)
+// app.get('/movie/:movieId', movieController.getDetailMovie)
+// app.post('/movie', movieController.validateMovie ,movieController.storeMovie)
+// app.delete('/movie/:movieId', movieController.deleteMovie)
+// app.put('/movie/:movieId', movieController.updateMovie)
 
 //User routes
 app.get('/users', userController.getAllusers)
