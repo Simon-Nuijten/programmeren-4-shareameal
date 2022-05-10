@@ -18,7 +18,7 @@ app.use(bodyParser.json());
 // app.put('/movie/:movieId', movieController.updateMovie)
 
 //User routes
-app.get('/api/users', userController.getAllusers)
+app.get('/api/user', userController.getAllusers)
 app.get('/api/user/:userId', userController.getDetailUser)
 app.post('/api/user', userController.storeUser)
 app.delete('/api/user/:userId', userController.deleteUser)
