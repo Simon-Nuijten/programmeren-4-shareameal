@@ -18,11 +18,11 @@ app.use(bodyParser.json());
 // app.put('/movie/:movieId', movieController.updateMovie)
 
 //User routes
-app.get('/users', userController.getAllusers)
-app.get('/user/:userId', userController.getDetailUser)
-app.post('/user', userController.storeUser)
-app.delete('/user/:userId', userController.deleteUser)
-app.put('/user/:userId', userController.updateUser)
+app.get('/api/users', userController.getAllusers)
+app.get('/api/user/:userId', userController.getDetailUser)
+app.post('/api/user', userController.storeUser)
+app.delete('/api/user/:userId', userController.deleteUser)
+app.put('/api/user/:userId', userController.updateUser)
 
 
 //Alle movie routes
