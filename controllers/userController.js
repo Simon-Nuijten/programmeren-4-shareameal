@@ -7,7 +7,29 @@ let userDatabase = []
 let id = 0;
 
 let userController = {
+    emailCheck(email) {
+      dbconnection.getConnection(function (err, connection) {
+        if (err) throw err; // not connected!
+      
+        connection.query(
+          "SELECT id, firstName FROM user WHERE user.emailAdress = " + email + ";",
+          function (error, results, fields) {
+            connection.release();
 
+            if (error) throw error;
+            
+            if (results.length>0){
+              return true;
+          }else{
+              return false;
+      
+            dbconnection.end( (err) => {
+              console.log('pool party is closed')
+            });
+          }
+          })
+        });
+    },
     getAllusers(req, res) {
       dbconnection.getConnection(function (err, connection) {
         if (err) throw err; // not connected!
@@ -76,13 +98,13 @@ let userController = {
                 connection.release();
 
                 if (error){
-                  return res.status(200).json({
-                    Status: 400,
-                    results: "User toevoegen onsuccesvol"
+                  return res.status(409).json({
+                    Status: 409,
+                    results: "User email bestaat al"
                   })
                 } else {
-                  return res.status(200).json({
-                    Status: 200,
+                  return res.status(201).json({
+                    Status: 201,
                     results: "User succesvol toegevoegd"
                })
                 }
@@ -145,8 +167,8 @@ let userController = {
                })
                 }
                 else {
-                  return res.status(200).json({
-                       Status: 200,
+                  return res.status(400).json({
+                       Status: 400,
                        results: "User niet gevonden",
                   })
                 }
