@@ -96,12 +96,12 @@ let userController = {
                 if (error){
                   return res.status(409).json({
                     Status: 409,
-                    results: "User email bestaat al"
+                    message: "User email bestaat al"
                   })
                 } else {
                   return res.status(201).json({
                     Status: 201,
-                    results: "User succesvol toegevoegd"
+                    results: values
                 })
                 }
                 
