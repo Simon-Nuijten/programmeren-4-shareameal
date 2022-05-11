@@ -3,9 +3,6 @@ const app = express();
 
 const dbconnection = require('../dbconnection')
 
-let userDatabase = []
-let id = 0;
-
 let userController = {
     emailCheck(email) {
       dbconnection.getConnection(function (err, connection) {
@@ -98,8 +95,8 @@ let userController = {
                 connection.release();
 
                 if (error){
-                  return res.status(409).json({
-                    Status: 409,
+                  return res.status(400).json({
+                    Status: 400,
                     results: "User email bestaat al"
                   })
                 } else {
