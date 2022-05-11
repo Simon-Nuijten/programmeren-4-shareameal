@@ -73,6 +73,12 @@ let userController = {
                     Error: err,
                 })
             let body = req.body
+            if(firstName == null || lastName == null || userEmail == null || isActive == null || password == null || phoneNumber == null || roles == null || street == null || city == null){
+              return res.status(400).json({
+                Status: 400,
+                message: "Je mag geen velden leeg laten",
+            })
+            }
             let query = `INSERT INTO user (firstName, lastName, isActive, emailAdress, password, phoneNumber, roles, street, city) VALUES ?`
             var values = [
                 [
@@ -82,7 +88,7 @@ let userController = {
                     userEmail,
                     password,
                     phoneNumber,
-                    body.roles,
+                    roles,
                     street,
                     city,
                 ],
