@@ -132,10 +132,10 @@ let userController = {
                        results: results[0],
                   })
               }else{
-                  res.status(404).json({
-                       Status: 404,
-                       Error: 'There is no user with this id!',
-                  })
+                res.status(404).json({
+                  Status: 404,
+                  message: 'There is no user with this id!',
+             })
           
                 dbconnection.end( (err) => {
                   console.log('pool party is closed')
@@ -163,10 +163,10 @@ let userController = {
                })
                 }
                 else {
-                  return res.status(400).json({
-                       Status: 400,
-                       results: "User niet gevonden",
-                  })
+                  res.status(404).json({
+                    Status: 404,
+                    message: 'There is no user with this id!',
+               })
                 }
                 
                   
