@@ -72,7 +72,7 @@ let userController = {
             //         Status: 400,
             //         Error: err,
             //     })
-            if(firstName == null | lastName == null | userEmail == null | password == null){
+            if(firstName == null | lastName == null | userEmail == null | password == null | isActive == null){
               return res.status(400).json({
                 Status: 400,
                 message: "Je mag geen velden leeg laten",
