@@ -9,7 +9,7 @@ let userController = {
         if (err) throw err; // not connected!
       
         connection.query(
-          "SELECT id, firstName FROM user WHERE user.emailAdress = " + email + ";",
+          "SELECT * FROM user WHERE user.emailAdress = " + email + ";",
           function (error, results, fields) {
             connection.release();
 
@@ -32,7 +32,7 @@ let userController = {
         if (err) throw err; // not connected!
       
         connection.query(
-          "SELECT id, firstName FROM user;",
+          "SELECT * FROM user;",
           function (error, results, fields) {
             connection.release();
 
@@ -72,7 +72,7 @@ let userController = {
             //         Status: 400,
             //         Error: err,
             //     })
-            if(firstName == null || lastName == null || userEmail == null || password == null || phoneNumber == null || roles == null || street == null || city == null){
+            if(firstName == null | lastName == null | userEmail == null | password == null){
               return res.status(400).json({
                 Status: 400,
                 message: "Je mag geen velden leeg laten",
@@ -125,7 +125,7 @@ let userController = {
             if (err) throw err; // not connected!
           
             connection.query(
-              "SELECT id, firstName FROM user WHERE user.id = " + userid + ";",
+              "SELECT * FROM user WHERE user.id = " + userid + ";",
               function (error, results, fields) {
                 connection.release();
 
