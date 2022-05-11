@@ -74,7 +74,7 @@ let userController = {
             //     })
             if(firstName == null || lastName == null || userEmail == null || password == null || phoneNumber == null || roles == null || street == null || city == null){
               return res.status(400).json({
-                Status: 400,
+                Status: 409,
                 message: "Je mag geen velden leeg laten",
               })
             }
