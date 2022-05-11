@@ -44,9 +44,9 @@ let userController = {
                    results: results,
               })
           }else{
-              res.status(400).json({
-                   Status: 400,
-                   Error: 'There is no user with this id!',
+              res.status(404).json({
+                   Status: 404,
+                   message: 'There is no user with this id!',
               })
       
             dbconnection.end( (err) => {
