@@ -94,8 +94,8 @@ let userController = {
                 connection.release();
 
                 if (error){
-                  return res.status(404).json({
-                    Status: 404,
+                  return res.status(409).json({
+                    Status: 409,
                     message: "User email bestaat al"
                   })
                 } else {
