@@ -163,8 +163,8 @@ let userController = {
                })
                 }
                 else {
-                  res.status(404).json({
-                    Status: 404,
+                  res.status(400).json({
+                    Status: 400,
                     message: 'There is no user with this id!',
                })
                 }
