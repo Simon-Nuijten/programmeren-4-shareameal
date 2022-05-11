@@ -24,38 +24,6 @@ app.post('/api/user', userController.storeUser)
 app.delete('/api/user/:userId', userController.deleteUser)
 app.put('/api/user/:userId', userController.updateUser)
 
-const userid = req.params.userId;
-          console.log(`User met ID ${userid} verwijdert`);
-          dbconnection.getConnection(function (err, connection) {
-            if (err) throw err; // not connected!
-          
-            connection.query(
-              "DELETE * FROM user;",
-              function (error, results, fields) {
-                connection.release();
-
-                if (results.affectedRows > 0){
-                  return res.status(200).json({
-                    Status: 200,
-                    results: "User succesvol verwijdert",
-               })
-                }
-                else {
-                  res.status(400).json({
-                    Status: 400,
-                    message: 'There is no user with this id!',
-               })
-                }
-                
-                  
-          
-          
-                dbconnection.end( (err) => {
-                  console.log('pool party is closed')
-                });
-              
-              })
-          });
 //Alle movie routes
 // app.use('/api', );
 
