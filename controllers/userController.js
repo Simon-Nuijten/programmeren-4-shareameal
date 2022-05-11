@@ -57,7 +57,6 @@ let userController = {
       });
     },
     storeUser(req, res)  {
-
           let firstName =  req.body.firstName;
           let lastName =  req.body.lastName;
           let userEmail =  req.body.emailAdress;
@@ -95,15 +94,15 @@ let userController = {
                 connection.release();
 
                 if (error){
-                  return res.status(400).json({
-                    Status: 400,
+                  return res.status(409).json({
+                    Status: 409,
                     results: "User email bestaat al"
                   })
                 } else {
                   return res.status(201).json({
                     Status: 201,
                     results: "User succesvol toegevoegd"
-               })
+                })
                 }
                 
           
