@@ -1,4 +1,5 @@
 const express = require("express");
+const { query } = require("../dbconnection");
 const app = express();
 
 const dbconnection = require('../dbconnection')
@@ -119,13 +120,21 @@ let userController = {
         
     },
     getDetailUser(req, res, next)  {
-          const userid = req.params.userId;
-          console.log(`User met ID ${userid} gezocht`);
+          const param = req.params.userId;
           dbconnection.getConnection(function (err, connection) {
             if (err) throw err; // not connected!
-          
+            console.log(param)
+            let queryDetail
+            if (param + 5 >= 0) {
+               console.log("number")
+               queryDetail = "SELECT * FROM user WHERE user.id = " + param + ";"
+            } else {
+              console.log("String")
+               queryDetail = `SELECT * FROM user WHERE user.firstName = '${param}';`
+            }
+            console.log(queryDetail)
             connection.query(
-              "SELECT * FROM user WHERE user.id = " + userid + ";",
+              queryDetail,
               function (error, results, fields) {
                 connection.release();
 
@@ -134,7 +143,39 @@ let userController = {
                 if (results.length>0){
                   return res.status(200).json({
                        Status: 200,
-                       results: results[0],
+                       results: results,
+                  })
+              }else{
+                res.status(404).json({
+                  Status: 404,
+                  message: 'There is no user with this id!',
+             })
+          
+                dbconnection.end( (err) => {
+                  console.log('pool party is closed')
+                });
+              }
+              })
+          });
+        
+        },
+        getNameUsers(req, res, next)  {
+          const userName = req.params.userName;
+          console.log(`User met ID ${userid} gezocht`);
+          dbconnection.getConnection(function (err, connection) {
+            if (err) throw err; // not connected!
+          
+            connection.query(
+              "SELECT * FROM user WHERE user.firstName = " + userName + ";",
+              function (error, results, fields) {
+                connection.release();
+
+                if (error) throw error;
+                
+                if (results.length>0){
+                  return res.status(200).json({
+                       Status: 200,
+                       results: results,
                   })
               }else{
                 res.status(404).json({

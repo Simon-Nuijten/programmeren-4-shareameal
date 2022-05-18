@@ -4,25 +4,20 @@ require('dotenv').config();
 const port = process.env.PORT || 3000;
 // const movieController = require('./controllers/movieController')
 const userController = require('./controllers/userController')
+const authController = require('./controllers/authController')
 
 const bodyParser = require("body-parser");
 const req = require("express/lib/request");
 app.use(bodyParser.json());
 
-
-//Movie routes
-// app.get('/movies', movieController.getAllMovies)
-// app.get('/movie/:movieId', movieController.getDetailMovie)
-// app.post('/movie', movieController.validateMovie ,movieController.storeMovie)
-// app.delete('/movie/:movieId', movieController.deleteMovie)
-// app.put('/movie/:movieId', movieController.updateMovie)
-
 //User routes
-app.get('/api/user', userController.getAllusers)
-app.get('/api/user/:userId', userController.getDetailUser)
-app.post('/api/user', userController.storeUser)
-app.delete('/api/user/:userId', userController.deleteUser)
-app.put('/api/user/:userId', userController.updateUser)
+app.get('/api/user', authController.validateToken, userController.getAllusers)
+app.get('/api/user/:userId', authController.validateToken, userController.getDetailUser)
+app.post('/api/user', authController.validateToken, userController.storeUser)
+app.delete('/api/user/:userId', authController.validateToken, userController.deleteUser)
+app.put('/api/user/:userId', authController.validateToken, userController.updateUser)
+
+app.post('/api/login', authController.login)
 
 //Alle movie routes
 // app.use('/api', );
