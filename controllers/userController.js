@@ -21,9 +21,6 @@ let userController = {
           }else{
               return false;
       
-            dbconnection.end( (err) => {
-              console.log('pool party is closed')
-            });
           }
           })
         });
@@ -41,18 +38,16 @@ let userController = {
             
             if (results.length>0){
               return res.status(200).json({
-                   Status: 200,
+                   statusCode: 200,
                    results: results,
               })
           }else{
               res.status(404).json({
-                   Status: 404,
-                   message: 'There is no user with this id!',
+                statusCode: 404,
+                   result: 'There is no user with this id!',
               })
       
-            dbconnection.end( (err) => {
-              console.log('pool party is closed')
-            });
+          
           }
           })
       });
@@ -75,8 +70,8 @@ let userController = {
             //     })
             if(firstName == null | lastName == null | userEmail == null | password == null | isActive == null | phoneNumber == null | roles == null){
               return res.status(400).json({
-                Status: 400,
-                message: "Je mag geen velden leeg laten",
+                statusCode: 400,
+                result: "Je mag geen velden leeg laten",
               })
             }
             let query = `INSERT INTO user (firstName, lastName, isActive, emailAdress, password, phoneNumber, roles, street, city) VALUES ?`
@@ -101,8 +96,8 @@ let userController = {
 
                 if (error){
                   return res.status(409).json({
-                    Status: 409,
-                    message: "User email bestaat al"
+                    statusCode: 409,
+                    result: "User email bestaat al"
                   })
                 } else {
                   return res.status(201).json({
@@ -112,9 +107,7 @@ let userController = {
                 }
                 
           
-                dbconnection.end( (err) => {
-                  console.log('pool party is closed')
-                });
+                
               })
           });
         
@@ -147,13 +140,11 @@ let userController = {
                   })
               }else{
                 res.status(404).json({
-                  Status: 404,
-                  message: 'There is no user with this id!',
+                  statusCode: 404,
+                  result: 'There is no user with this id!',
              })
           
-                dbconnection.end( (err) => {
-                  console.log('pool party is closed')
-                });
+             
               }
               })
           });
@@ -174,18 +165,16 @@ let userController = {
                 
                 if (results.length>0){
                   return res.status(200).json({
-                       Status: 200,
+                    statusCode: 200,
                        results: results,
                   })
               }else{
                 res.status(404).json({
-                  Status: 404,
-                  message: 'There is no user with this id!',
+                  statusCode: 404,
+                  result: 'There is no user with this id!',
              })
           
-                dbconnection.end( (err) => {
-                  console.log('pool party is closed')
-                });
+           
               }
               })
           });
@@ -204,24 +193,21 @@ let userController = {
 
                 if (results.affectedRows > 0){
                   return res.status(200).json({
-                    Status: 200,
+                    statusCode: 200,
                     results: "User succesvol verwijdert",
                })
                 }
                 else {
                   res.status(400).json({
-                    Status: 400,
-                    message: 'There is no user with this id!',
+                    statusCode: 400,
+                    result: 'There is no user with this id!',
                })
                 }
                 
                   
           
           
-                dbconnection.end( (err) => {
-                  console.log('pool party is closed')
-                });
-              
+                
               })
           });
         },
@@ -241,7 +227,7 @@ let userController = {
             //not connected
             if (err)
               throw res.status(400).json({
-                Status: 400,
+                statusCode: 400,
                 Error: err,
               });
       
@@ -263,7 +249,7 @@ let userController = {
                 // succesfull query handlers
                 if (results.affectedRows > 0) {
                   res.status(200).json({
-                    status: 200,
+                    statusCode: 200,
                     result: `User with id ${req.params.userId} updated.`,
                   });
                 } else {

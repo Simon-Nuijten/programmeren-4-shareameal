@@ -27,7 +27,9 @@ const INSERT_MEALS =
     "(1, 'Meal A', 'description', 'image url', NOW(), 5, 6.50, 1)," +
     "(2, 'Meal B', 'description', 'image url', NOW(), 5, 6.50, 1);"
 
-
+const INSERT_MEALS_PAR =
+    'INSERT INTO `meal_participants_user` (`userId`, `mealId`) VALUES' +
+    "(1, 1);"
 
 describe('Meals API', () => {
     //
@@ -255,6 +257,51 @@ describe('Meals API', () => {
         })
         // En hier komen meer testcases
     })
+    describe('TC 204-3 gebruiker naam bestaat niet', () => {
+        //
+        beforeEach((done) => {
+            logger.debug('beforeEach called')
+            // maak de testdatabase opnieuw aan zodat we onze testen kunnen uitvoeren.
+            dbconnection.getConnection(function (err, connection) {
+                if (err) throw err // not connected!
+                connection.query(
+                    CLEAR_DB + INSERT_USER + INSERT_MEALS,
+                    function (error, results, fields) {
+                        // When done with the connection, release it.
+                        connection.release()
+                        // Handle error after the release.
+                        if (error) throw error
+                        // Let op dat je done() pas aanroept als de query callback eindigt!
+                        logger.debug('beforeEach done')
+                        done()
+                    }
+                )
+            })
+        })
+
+        it('TC 204-3 gebruiker naam bestaat niet', (done) => {
+            chai.request(server)
+                .get('/api/user/third')
+                .set(
+                    'authorization',
+                    'Bearer ' + jwt.sign({ userId: 1 }, jwtSecretKey)
+                )
+                .end((err, res) => {
+                    assert.ifError(err)
+
+                    res.should.have.status(404)
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.all.keys('result', 'statusCode')
+
+                    const { statusCode, result } = res.body
+                    statusCode.should.be.an('number')
+                    done()
+                })
+        })
+        // En hier komen meer testcases
+    })
     describe('TC 202-6 toon gebruikers met een bestaande naam', () => {
         //
         beforeEach((done) => {
@@ -300,6 +347,7 @@ describe('Meals API', () => {
         })
         // En hier komen meer testcases
     })
+    
     describe('TC 204-3 Gebruiker-ID bestaat', () => {
         //
         beforeEach((done) => {
@@ -424,6 +472,65 @@ describe('Meals API', () => {
                     isVega: 1,
                     isVegan: 1,
                     isToTakeHome: 1,
+                    maxAmountOfParticipants: 6,
+                    price: 2.50,
+                    imageUrl: 'hoppa.com',
+                    cookId: 1,
+                    name: 'pannenkoeken',
+                    description: 'met stroop',
+                    allergenes: 'gluten',
+                }).set(
+                    'authorization',
+                    'Bearer ' + jwt.sign({ userId: 1 }, jwtSecretKey)
+                )
+                .end((err, res) => {
+                    assert.ifError(err)
+                    res.should.have.status(401)
+                    res.should.be.an('object')
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.all.keys('statusCode', 'message')
+                    done()
+                })
+        })
+
+        // En hier komen meer testcases
+    })
+    describe('TC 302-2 update meal without login', () => {
+        //
+        beforeEach((done) => {
+            logger.debug('beforeEach called')
+            // maak de testdatabase leeg zodat we onze testen kunnen uitvoeren.
+            dbconnection.getConnection(function (err, connection) {
+                if (err) throw err // not connected!
+
+                // Use the connection
+                connection.query(
+                    CLEAR_DB + INSERT_USER,
+                    function (error, results, fields) {
+                        // When done with the connection, release it.
+                        connection.release()
+
+                        // Handle error after the release.
+                        if (error) throw error
+                        // Let op dat je done() pas aanroept als de query callback eindigt!
+                        logger.debug('beforeEach done')
+                        done()
+                    }
+                )
+            })
+        })
+
+        it('TC 302-2 update meal without login', (done) => {
+            chai.request(server)
+                .put('/api/meal/1')
+                .send({
+                    // name is missing
+                    isActive: 1,
+                    isVega: 1,
+                    isVegan: 1,
+                    isToTakeHome: 1,
                     dateTime: new Date(),
                     maxAmountOfParticipants: 6,
                     price: 2.50,
@@ -434,13 +541,189 @@ describe('Meals API', () => {
                     name: 'pannenkoeken',
                     description: 'met stroop',
                     allergenes: 'gluten',
-                }).set(
+                })
+                .end((err, res) => {
+                    assert.ifError(err)
+                    res.should.have.status(401)
+                    res.should.be.an('object')
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.all.keys('error', 'datetime')
+                    done()
+                })
+        })
+
+        // En hier komen meer testcases
+    })
+    describe('TC 302-2 update meal missing field', () => {
+        //
+        beforeEach((done) => {
+            logger.debug('beforeEach called')
+            // maak de testdatabase leeg zodat we onze testen kunnen uitvoeren.
+            dbconnection.getConnection(function (err, connection) {
+                if (err) throw err // not connected!
+
+                // Use the connection
+                connection.query(
+                    CLEAR_DB + INSERT_USER,
+                    function (error, results, fields) {
+                        // When done with the connection, release it.
+                        connection.release()
+
+                        // Handle error after the release.
+                        if (error) throw error
+                        // Let op dat je done() pas aanroept als de query callback eindigt!
+                        logger.debug('beforeEach done')
+                        done()
+                    }
+                )
+            })
+        })
+
+        it('TC 302-4 update meal, meal doesnt exist', (done) => {
+            chai.request(server)
+                .put('/api/meal/1234234')
+                .send({
+                    // price is missing
+                    isActive: 1,
+                    isVega: 1,
+                    isVegan: 1,
+                    isToTakeHome: 1,
+                    dateTime: new Date(),
+                    maxAmountOfParticipants: 6,
+                    imageUrl: 'hoppa.com',
+                    cookId: 1,
+                    createDate: new Date(),
+                    updateDate: new Date(),
+                    name: 'pannenkoeken',
+                    description: 'met stroop',
+                    allergenes: 'gluten',
+                })
+                .end((err, res) => {
+                    assert.ifError(err)
+                    res.should.have.status(401)
+                    res.should.be.an('object')
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.all.keys('error', 'datetime')
+                    done()
+                })
+        })
+
+        // En hier komen meer testcases
+    })
+    describe('TC 302-2 update meal missing field', () => {
+        //
+        beforeEach((done) => {
+            logger.debug('beforeEach called')
+            // maak de testdatabase leeg zodat we onze testen kunnen uitvoeren.
+            dbconnection.getConnection(function (err, connection) {
+                if (err) throw err // not connected!
+
+                // Use the connection
+                connection.query(
+                    CLEAR_DB + INSERT_USER,
+                    function (error, results, fields) {
+                        // When done with the connection, release it.
+                        connection.release()
+
+                        // Handle error after the release.
+                        if (error) throw error
+                        // Let op dat je done() pas aanroept als de query callback eindigt!
+                        logger.debug('beforeEach done')
+                        done()
+                    }
+                )
+            })
+        })
+
+        it('TC 302-2 update meal missing field', (done) => {
+            chai.request(server)
+                .put('/api/meal/1')
+                .send({
+                    // price is missing
+                    isActive: 1,
+                    isVega: 1,
+                    isVegan: 1,
+                    isToTakeHome: 1,
+                    dateTime: new Date(),
+                    maxAmountOfParticipants: 6,
+                    imageUrl: 'hoppa.com',
+                    cookId: 1,
+                    createDate: new Date(),
+                    updateDate: new Date(),
+                    name: 'pannenkoeken',
+                    description: 'met stroop',
+                    allergenes: 'gluten',
+                })
+                .end((err, res) => {
+                    assert.ifError(err)
+                    res.should.have.status(401)
+                    res.should.be.an('object')
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.all.keys('error', 'datetime')
+                    done()
+                })
+        })
+
+        // En hier komen meer testcases
+    })
+    describe('TC 302-5 update meal with login', () => {
+        //
+        beforeEach((done) => {
+            logger.debug('beforeEach called')
+            // maak de testdatabase leeg zodat we onze testen kunnen uitvoeren.
+            dbconnection.getConnection(function (err, connection) {
+                if (err) throw err // not connected!
+
+                // Use the connection
+                connection.query(
+                    CLEAR_DB + INSERT_USER,
+                    function (error, results, fields) {
+                        // When done with the connection, release it.
+                        connection.release()
+
+                        // Handle error after the release.
+                        if (error) throw error
+                        // Let op dat je done() pas aanroept als de query callback eindigt!
+                        logger.debug('beforeEach done')
+                        done()
+                    }
+                )
+            })
+        })
+
+        it('TC 302-5 update meal with login', (done) => {
+            chai.request(server)
+                .put('/api/meal/1')
+                .send({
+                    // name is missing
+                    isActive: 1,
+                    isVega: 1,
+                    isVegan: 1,
+                    isToTakeHome: 1,
+                    dateTime: new Date(),
+                    maxAmountOfParticipants: 6,
+                    price: 2.50,
+                    imageUrl: 'hoppa.com',
+                    cookId: 1,
+                    createDate: new Date(),
+                    updateDate: new Date(),
+                    name: 'pannenkoeken',
+                    description: 'met stroop',
+                    allergenes: 'gluten',
+                })
+                .set(
                     'authorization',
                     'Bearer ' + jwt.sign({ userId: 1 }, jwtSecretKey)
                 )
                 .end((err, res) => {
                     assert.ifError(err)
-                    res.should.have.status(201)
+                    res.should.have.status(400)
                     res.should.be.an('object')
 
                     res.body.should.be
@@ -1003,5 +1286,164 @@ describe('Meals API', () => {
         })
         // En hier komen meer testcases
     })
-    
+    describe('TC-306-1 uitschrijven van een maaltijd', () => {
+        //
+        beforeEach((done) => {
+            logger.debug('beforeEach called')
+            // maak de testdatabase opnieuw aan zodat we onze testen kunnen uitvoeren.
+            dbconnection.getConnection(function (err, connection) {
+                if (err) throw err // not connected!
+                connection.query(
+                    CLEAR_DB + INSERT_USER + INSERT_MEALS + INSERT_MEALS_PAR,
+                    function (error, results, fields) {
+                        // When done with the connection, release it.
+                        connection.release()
+                        // Handle error after the release.
+                        if (error) throw error
+                        // Let op dat je done() pas aanroept als de query callback eindigt!
+                        logger.debug('beforeEach done')
+                        done()
+                    }
+                )
+            })
+        })
+
+        it('TC-306-1 uitschrijven van een maaltijd', (done) => {
+            chai.request(server)
+                .delete('/api/mealParticepate/1')
+                .set(
+                    'authorization',
+                    'Bearer ' + jwt.sign({ userId: 1 }, jwtSecretKey)
+                )
+                .end((err, res) => {
+                    assert.ifError(err)
+                    res.should.have.status(200)
+                    res.should.be.an('object')
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.all.keys('results', 'statusCode')
+                    done()
+                })
+        })
+        // En hier komen meer testcases
+    })
+    describe('TC-305-3 Niet de eigenaar van de meal', () => {
+        //
+        beforeEach((done) => {
+            logger.debug('beforeEach called')
+            // maak de testdatabase opnieuw aan zodat we onze testen kunnen uitvoeren.
+            dbconnection.getConnection(function (err, connection) {
+                if (err) throw err // not connected!
+                connection.query(
+                    CLEAR_DB + INSERT_USER + INSERT_MEALS + INSERT_MEALS_PAR,
+                    function (error, results, fields) {
+                        // When done with the connection, release it.
+                        connection.release()
+                        // Handle error after the release.
+                        if (error) throw error
+                        // Let op dat je done() pas aanroept als de query callback eindigt!
+                        logger.debug('beforeEach done')
+                        done()
+                    }
+                )
+            })
+        })
+
+        it('TC-305-3 Niet de eigenaar van de meal', (done) => {
+            chai.request(server)
+                .delete('/api/meal/1')
+                .set(
+                    'authorization',
+                    'Bearer ' + jwt.sign({ userId: 100 }, jwtSecretKey)
+                )
+                .end((err, res) => {
+                    assert.ifError(err)
+                    res.should.have.status(404)
+                    res.should.be.an('object')
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.all.keys('message', 'statusCode')
+                    done()
+                })
+        })
+        // En hier komen meer testcases
+    })
+    describe('TC-306-1 uitschrijven voor een niet bestaande maaltijd', () => {
+        //
+        beforeEach((done) => {
+            logger.debug('beforeEach called')
+            // maak de testdatabase opnieuw aan zodat we onze testen kunnen uitvoeren.
+            dbconnection.getConnection(function (err, connection) {
+                if (err) throw err // not connected!
+                connection.query(
+                    CLEAR_DB + INSERT_USER + INSERT_MEALS + INSERT_MEALS_PAR,
+                    function (error, results, fields) {
+                        // When done with the connection, release it.
+                        connection.release()
+                        // Handle error after the release.
+                        if (error) throw error
+                        // Let op dat je done() pas aanroept als de query callback eindigt!
+                        logger.debug('beforeEach done')
+                        done()
+                    }
+                )
+            })
+        })
+
+        it('TC-306-1 uitschrijven voor een niet bestaande maaltijd', (done) => {
+            chai.request(server)
+                .delete('/api/mealParticepate/16453424')
+                .end((err, res) => {
+                    assert.ifError(err)
+                    res.should.have.status(401)
+                    res.should.be.an('object')
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.all.keys('error', 'datetime')
+                    done()
+                })
+        })
+        // En hier komen meer testcases
+    })
+    describe('TC-306-1 uitschrijven van een maaltijd zonder ingelogd te zijn', () => {
+        //
+        beforeEach((done) => {
+            logger.debug('beforeEach called')
+            // maak de testdatabase opnieuw aan zodat we onze testen kunnen uitvoeren.
+            dbconnection.getConnection(function (err, connection) {
+                if (err) throw err // not connected!
+                connection.query(
+                    CLEAR_DB + INSERT_USER + INSERT_MEALS + INSERT_MEALS_PAR,
+                    function (error, results, fields) {
+                        // When done with the connection, release it.
+                        connection.release()
+                        // Handle error after the release.
+                        if (error) throw error
+                        // Let op dat je done() pas aanroept als de query callback eindigt!
+                        logger.debug('beforeEach done')
+                        done()
+                    }
+                )
+            })
+        })
+
+        it('TC-306-2 uitschrijven van een maaltijd', (done) => {
+            chai.request(server)
+                .delete('/api/mealParticepate/1')
+                .end((err, res) => {
+                    assert.ifError(err)
+                    res.should.have.status(401)
+                    res.should.be.an('object')
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.all.keys('error', 'datetime')
+                    done()
+                })
+        })
+        // En hier komen meer testcases
+    })
 })

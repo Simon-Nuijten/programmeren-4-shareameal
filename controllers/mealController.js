@@ -30,8 +30,8 @@ let mealController = {
                 })
             }else{
                 res.status(404).json({
-                     Status: 404,
-                     message: 'There is no user with this id!',
+                     statusCode: 404,
+                     result: 'There is no user with this id!',
                 })
         
               dbconnection.end( (err) => {
@@ -74,35 +74,60 @@ let mealController = {
       
       },
       deleteMeal(req, res, next)  {
-        const param = req.params.mealId;
-        dbconnection.getConnection(function (err, connection) {
-          if (err) throw err; // not connected!
-          console.log(param)
-          
-          let queryDetail = "DELETE FROM meal WHERE meal.id = " + param + ";"
-        
-          console.log(queryDetail)
-          connection.query(
-            queryDetail,
-            function (error, results, fields) {
-              connection.release();
-
-              if (error) throw error;
+        const param = req.params.mealId
+          dbconnection.getConnection(function (err, connection) {
+              if (err) throw err; // not connected!
+              console.log(param)
               
-              if (results.affectedRows > 0){
-                return res.status(200).json({
-                  statusCode: 200,
-                  results: "Meal succesvol verwijdert",
-             })
-            }else{
-              res.status(404).json({
-                statusCode: 404,
-                message: 'There is no meal with this id!',
-           })
-        
-            }
-            })
-        });
+              let queryDetail = "SELECT * FROM meal WHERE meal.id = " + param + " AND meal.cookId = " + req.userId +  ";"
+            
+              console.log(queryDetail)
+              connection.query(
+                queryDetail,
+                function (error, results, fields) {
+                  connection.release();
+    
+                  if (error) throw error;
+                  
+                  if (results.length>0){
+                    dbconnection.getConnection(function (err, connection) {
+                      if (err) throw err; // not connected!
+                      console.log(param)
+                      
+                      let queryDetail = "DELETE FROM meal WHERE meal.id = " + param + ";"
+                    
+                      console.log(queryDetail)
+                      connection.query(
+                        queryDetail,
+                        function (error, results, fields) {
+                          connection.release();
+            
+                          if (error) throw error;
+                          
+                          if (results.affectedRows > 0){
+                            return res.status(200).json({
+                              statusCode: 200,
+                              results: "Deelnamen succesvol verwijdert",
+                         })
+                        }else{
+                          res.status(404).json({
+                            statusCode: 404,
+                            message: 'There is no meal with this id!',
+                       })
+                    
+                        }
+                        })
+                    });
+                      
+                }else{
+                  res.status(404).json({
+                    statusCode: 404,
+                    message: 'This is not your meal',
+               })
+            
+                }
+                })
+            });
       },
       createMeal(req, res, next)  {
         console.log(req.userId)
@@ -159,9 +184,6 @@ let mealController = {
                     result: values
                 })
                 }
-                dbconnection.end( (err) => {
-                    console.log('pool party is closed')
-                  });
                 })
             });
       },
@@ -221,6 +243,111 @@ let mealController = {
               })
           });
         },
+        particepateDelete(req, res)  {
+          const param = req.params.mealId
+          dbconnection.getConnection(function (err, connection) {
+              if (err) throw err; // not connected!
+              console.log(param)
+              
+              let queryDetail = "SELECT * FROM meal WHERE meal.id = " + param + ";"
+            
+              console.log(queryDetail)
+              connection.query(
+                queryDetail,
+                function (error, results, fields) {
+                  connection.release();
+    
+                  if (error) throw error;
+                  
+                  if (results.length>0){
+                    dbconnection.getConnection(function (err, connection) {
+                      if (err) throw err; // not connected!
+                      console.log(param)
+                      
+                      let queryDetail = "DELETE FROM meal_participants_user WHERE meal_participants_user.mealId = " + param + " AND meal_participants_user.userId ="+ req.userId+" ;"
+                    
+                      console.log(queryDetail)
+                      connection.query(
+                        queryDetail,
+                        function (error, results, fields) {
+                          connection.release();
+            
+                          if (error) throw error;
+                          
+                          if (results.affectedRows > 0){
+                            return res.status(200).json({
+                              statusCode: 200,
+                              results: "Deelnamen succesvol verwijdert",
+                         })
+                        }else{
+                          res.status(404).json({
+                            statusCode: 404,
+                            message: 'There is no meal with this id!',
+                       })
+                    
+                        }
+                        })
+                    });
+                      
+                }else{
+                  res.status(400).json({
+                    statusCode: 400,
+                    result: 'There is no meal with this id!',
+               })
+            
+                }
+                })
+            });
+          },
+          updateMeal(req, res, next)  {
+            let param = req.params.mealId
+            let mealReq = req.body;
+            let {
+              isActive,
+              isVega,
+              isVegan,
+              isToTakeHome,
+              maxAmountOfParticipants,
+              price,
+              imageUrl,
+              cookid,
+              name,
+              description,
+              allergenes
+            } = mealReq;
+            dbconnection.getConnection(function (err, connection) {
+              //not connected        
+              // Use the connection
+              connection.query(
+                `UPDATE meal SET isActive = '${isActive}', isVega = '${isVega}', isVegan = '${isVegan}', isToTakeHome = '${isToTakeHome}', dateTime = NOW(), maxAmountOfParticipants = '${maxAmountOfParticipants}', price = '${price}', imageUrl = '${imageUrl}', cookid = 1, createDate = NOW(), updateDate = NOW() , name = '${name}', description = '${description}' , allergenes = '${allergenes}' WHERE id = ${param}`,
+                function (error, results, fields) {
+                  // When done with the connection, release it.
+                  connection.release();
+                  // Handle error after the release.
+                  if (error) {
+                    console.log(error);
+                    return res.status(400).json({
+                      statusCode: 408,
+                      result: `Updating meal failed.`,
+                    });
+                  }
+        
+                  // succesfull query handlers
+                  if (results.affectedRows > 0) {
+                    res.status(200).json({
+                      statusCode: 200,
+                      result: `Meal updated.`,
+                    });
+                  } else {
+                    res.status(400).json({
+                      statusCode: 407,
+                      result: `Updating Meal failed.`,
+                    });
+                  }
+                }
+              );
+            })
+          },
 }
 module.exports = mealController;
     
