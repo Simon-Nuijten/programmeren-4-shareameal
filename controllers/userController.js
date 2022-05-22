@@ -142,8 +142,8 @@ let userController = {
                 
                 if (results.length>0){
                   return res.status(200).json({
-                       Status: 200,
-                       results: results,
+                       statusCode: 200,
+                       result: results,
                   })
               }else{
                 res.status(404).json({
@@ -255,8 +255,8 @@ let userController = {
                 if (error) {
                   console.log(error);
                   return res.status(400).json({
-                    status: 400,
-                    error: error.message,
+                    statusCode: 400,
+                    result: `Updating user failed.`,
                   });
                 }
       
@@ -268,7 +268,7 @@ let userController = {
                   });
                 } else {
                   res.status(400).json({
-                    status: 400,
+                    statusCode: 400,
                     result: `Updating user failed.`,
                   });
                 }

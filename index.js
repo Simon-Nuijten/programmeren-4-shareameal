@@ -5,11 +5,18 @@ const port = process.env.PORT || 3000;
 // const movieController = require('./controllers/movieController')
 const userController = require('./controllers/userController')
 const authController = require('./controllers/authController')
+const mealController = require('./controllers/mealController')
 
 const bodyParser = require("body-parser");
 const req = require("express/lib/request");
 app.use(bodyParser.json());
 
+//Meal routes
+app.get('/api/meals', authController.validateToken, mealController.getAllmeals)
+app.get('/api/meal/:mealId', authController.validateToken, mealController.getDetailMeal)
+app.delete('/api/meal/:mealId', authController.validateToken, mealController.deleteMeal)
+app.post('/api/meal', authController.validateToken, mealController.createMeal)
+app.post('/api/mealParticepate/:mealId', authController.validateToken, mealController.particepate)
 //User routes
 app.get('/api/user', authController.validateToken, userController.getAllusers)
 app.get('/api/user/:userId', authController.validateToken, userController.getDetailUser)
@@ -55,4 +62,4 @@ app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
 
-module.export = app
+module.exports = app
