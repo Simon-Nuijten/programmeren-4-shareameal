@@ -7,6 +7,7 @@ on:
 
 jobs:
   deploy:
+    needs: intergrationtests
     runs-on: ubuntu-latest
     environment:
       name: Heroku # naam van mijn environment op GitHub
