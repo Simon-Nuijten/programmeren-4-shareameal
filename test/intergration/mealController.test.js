@@ -490,7 +490,7 @@ describe('Meals API', () => {
 
                     res.body.should.be
                         .an('object')
-                        .that.has.all.keys('statusCode', 'result')
+                        .that.has.all.keys('statusCode', 'message')
                     done()
                 })
         })
