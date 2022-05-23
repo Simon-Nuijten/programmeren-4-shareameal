@@ -12,9 +12,9 @@ jobs:
       MYSQL_ROOT_PASSWORD: root # default root password to use must be 'root'
       DB_HOST: localhost
       DB_PORT: 3306
-      DB_DATABASE: 2184065
+      DB_DATABASE: share_a_meal
       DB_USER: root
-      DB_PASSWORD: Simon4312@
+      DB_PASSWORD: root
     services:
       mysql:
         image: mysql:5.7
