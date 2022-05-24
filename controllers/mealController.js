@@ -179,7 +179,7 @@ let mealController = {
                 } else {
                   return res.status(201).json({
                     statusCode: 201,
-                    result: values
+                    result: results
                 })
                 }
                 })
@@ -332,10 +332,10 @@ let mealController = {
         
                   // succesfull query handlers
                   if (results.affectedRows > 0) {
-                    return res.status(201).json({
-                      statusCode: 201,
-                      result: values
-                  })
+                    res.status(200).json({
+                      statusCode: 200,
+                      result: `Meal updated.`,
+                    });
                   } else {
                     res.status(400).json({
                       statusCode: 407,
