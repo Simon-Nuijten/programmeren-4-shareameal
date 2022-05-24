@@ -334,7 +334,7 @@ let mealController = {
                   if (results.affectedRows > 0) {
                     res.status(200).json({
                       statusCode: 200,
-                      result: `Meal updated.`,
+                      result: results,
                     });
                   } else {
                     res.status(400).json({
