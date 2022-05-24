@@ -141,11 +141,9 @@ let mealController = {
           let price =  req.body.price;
           let imageUrl =  req.body.imageUrl;
           let cookId  =  req.userId;
-          let name  =  req.name;
-          let description  =  req.description;
-          let allergenes  =  req.allergenes;
-          let createDate  =  req.createDate;
-          let updateDate  =  req.updateDate;
+          let nameBody  =  req.body.name;
+          let descriptionBody  =  req.body.description;
+          let allergenesBody  =  req.body.allergenes;
           dbconnection.getConnection(function (err, connection) {
             let query = `INSERT INTO meal (id, isActive, isVega, isVegan, isToTakeHome, dateTime, maxAmountOfParticipants, price, imageUrl,cookId , createDate, updateDate, name, description, allergenes) VALUES ?`
             var values = [
@@ -162,9 +160,9 @@ let mealController = {
                     cookId,
                     "now()",
                     "now()",
-                    req.body.name,
-                    req.body.description,
-                    req.body.allergenes,
+                    nameBody,
+                    descriptionBody,
+                    allergenesBody,
                 ],
             ]
             connection.query(
