@@ -25,6 +25,33 @@ let userController = {
           })
         });
     },
+    getAllActiveUsers(req, res) {
+      dbconnection.getConnection(function (err, connection) {
+        if (err) throw err; // not connected!
+      
+        connection.query(
+          "SELECT * FROM user WHERE isActive = 1;",
+          function (error, results, fields) {
+            connection.release();
+
+            if (error) throw error;
+            
+            if (results.length>0){
+              return res.status(200).json({
+                   statusCode: 200,
+                   results: results,
+              })
+          }else{
+              res.status(404).json({
+                statusCode: 404,
+                   result: 'There is no user with this id!',
+              })
+      
+          
+          }
+          })
+      });
+    },
     getAllusers(req, res) {
       dbconnection.getConnection(function (err, connection) {
         if (err) throw err; // not connected!
