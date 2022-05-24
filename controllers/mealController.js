@@ -162,9 +162,9 @@ let mealController = {
                     cookId,
                     "now()",
                     "now()",
-                    'pannenkoeken',
-                    'met stroop',
-                    'gluten',
+                    req.body.name,
+                    req.body.description,
+                    req.body.allergenes,
                 ],
             ]
             connection.query(
