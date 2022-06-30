@@ -763,12 +763,12 @@ describe('Meals API', () => {
                 )
                 .end((err, res) => {
                     assert.ifError(err)
-                    res.should.have.status(400)
+                    res.should.have.status(404)
                     res.should.be.an('object')
 
                     res.body.should.be
                         .an('object')
-                        .that.has.all.keys('statusCode', 'result')
+                        .that.has.all.keys('statusCode', 'message')
                     done()
                 })
         })
