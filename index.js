@@ -25,7 +25,7 @@ app.get('/api/user/:userId', authController.validateToken, userController.getDet
 app.post('/api/user', authController.validateToken, userController.storeUser)
 app.delete('/api/user/:userId', authController.validateToken, userController.deleteUser)
 app.put('/api/user/:userId', authController.validateToken, userController.updateUser)
-app.get( "/api/user", userController.userList);
+app.get( "/api/user", authController.validateToken, userController.userList);
 app.get('/api/userActive', authController.validateToken, userController.getAllActiveUsers)
 
 app.post('/api/login', authController.login)
