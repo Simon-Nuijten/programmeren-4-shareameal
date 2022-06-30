@@ -20,11 +20,12 @@ app.post('/api/mealParticepate/:mealId', authController.validateToken, mealContr
 app.delete('/api/mealParticepate/:mealId', authController.validateToken, mealController.particepateDelete)
 app.put('/api/meal/:mealId', authController.validateToken, mealController.updateMeal)
 //User routes
-app.get('/api/user', authController.validateToken, userController.getAllusers)
+// app.get('/api/user', authController.validateToken, userController.getAllusers)
 app.get('/api/user/:userId', authController.validateToken, userController.getDetailUser)
 app.post('/api/user', authController.validateToken, userController.storeUser)
 app.delete('/api/user/:userId', authController.validateToken, userController.deleteUser)
 app.put('/api/user/:userId', authController.validateToken, userController.updateUser)
+app.get( "/api/user", userController.userList);
 app.get('/api/userActive', authController.validateToken, userController.getAllActiveUsers)
 
 app.post('/api/login', authController.login)

@@ -107,7 +107,7 @@ let mealController = {
                           if (results.affectedRows > 0){
                             return res.status(200).json({
                               statusCode: 200,
-                              results: "Deelnamen succesvol verwijdert",
+                              results: "Meal deleted",
                          })
                         }else{
                           res.status(404).json({
@@ -179,7 +179,7 @@ let mealController = {
                 } else {
                   return res.status(201).json({
                     statusCode: 201,
-                    result: results
+                    results: req.body
                 })
                 }
                 })
@@ -314,6 +314,21 @@ let mealController = {
               allergenes
             } = mealReq;
             dbconnection.getConnection(function (err, connection) {
+              if (err) throw err; // not connected!
+              console.log(param)
+              
+              let queryDetail = "SELECT * FROM meal WHERE meal.id = " + param + " AND meal.cookId = " + req.userId +  ";"
+            
+              console.log(queryDetail)
+              connection.query(
+                queryDetail,
+                function (error, results, fields) {
+                  connection.release();
+    
+                  if (error) throw error;
+                  
+                  if (results.length>0){
+                     dbconnection.getConnection(function (err, connection) {
               //not connected        
               // Use the connection
               connection.query(
@@ -334,7 +349,7 @@ let mealController = {
                   if (results.affectedRows > 0) {
                     res.status(200).json({
                       statusCode: 200,
-                      result: results,
+                      result: req.body
                     });
                   } else {
                     res.status(400).json({
@@ -345,6 +360,16 @@ let mealController = {
                 }
               );
             })
+                      
+                }else{
+                  res.status(404).json({
+                    statusCode: 404,
+                    message: 'This is not your meal',
+               })
+            
+                }
+                })
+            });
           },
 }
 module.exports = mealController;

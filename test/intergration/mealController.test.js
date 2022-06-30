@@ -281,7 +281,7 @@ describe('Meals API', () => {
 
         it('TC 204-3 gebruiker naam bestaat niet', (done) => {
             chai.request(server)
-                .get('/api/user/third')
+                .get('/api/user/?firstName=klaas')
                 .set(
                     'authorization',
                     'Bearer ' + jwt.sign({ userId: 1 }, jwtSecretKey)
@@ -289,7 +289,7 @@ describe('Meals API', () => {
                 .end((err, res) => {
                     assert.ifError(err)
 
-                    res.should.have.status(404)
+                    res.should.have.status(200)
 
                     res.body.should.be
                         .an('object')
@@ -297,6 +297,7 @@ describe('Meals API', () => {
 
                     const { statusCode, result } = res.body
                     statusCode.should.be.an('number')
+                    // result.should.be.a("string").that.equals("");
                     done()
                 })
         })
@@ -326,7 +327,7 @@ describe('Meals API', () => {
 
         it('TC 202-6 toon gebruikers met een bestaande naam', (done) => {
             chai.request(server)
-                .get('/api/user/first')
+                .get('/api/user/?firstName=first')
                 .set(
                     'authorization',
                     'Bearer ' + jwt.sign({ userId: 1 }, jwtSecretKey)
@@ -341,7 +342,7 @@ describe('Meals API', () => {
                         .that.has.all.keys('result', 'statusCode')
 
                     const { statusCode, result } = res.body
-                    statusCode.should.be.an('number')
+                    // statusCode.should.be.an('number')
                     done()
                 })
         })
@@ -379,19 +380,55 @@ describe('Meals API', () => {
                 )
                 .end((err, res) => {
                     assert.ifError(err)
-
+                    let { status, results} = res.body;
                     res.should.have.status(200)
 
                     res.body.should.be
                         .an('object')
-                        .that.has.all.keys('result', 'statusCode')
+                        .that.has.all.keys('results', 'statusCode')
 
                     const { statusCode, result } = res.body
                     statusCode.should.be.an('number')
                     done()
                 })
         })
-        // En hier komen meer testcases
+        it("TC-201-5 Gebruiker succesvol geregistreerd", (done) => {
+            chai
+              .request(server)
+              .post("/api/user")
+              .send({
+                firstName: "Boudewijn",
+                lastName: "Roderick",
+                street: "Bernardlaan",
+                city: "Breda",
+                isActive: true,
+                emailAdress: "Avans@avans.nl",
+                password: "secret#f4Dtfeer",
+                phoneNumber: "06 12425475",
+                roles: "admin"
+              }).set(
+                'authorization',
+                'Bearer ' + jwt.sign({ userId: 1 }, jwtSecretKey)
+            )
+              .end((err, res) => {
+                res.should.be.an("Object");
+                let { status, results } = res.body;
+                res.should.have.status(201)
+                results.firstName.should.be.a("string").that.equals("Boudewijn");
+                results.lastName.should.be.a("string").that.equals("Roderick");
+                results.street.should.be
+                  .a("string")
+                  .that.equals("Bernardlaan");
+                  results.city.should.be.a("string").that.equals("Breda");
+                  results.isActive.should.be.a("boolean").that.equals(true);
+                  results.emailAdress.should.be
+                  .a("string")
+                  .that.equals("Avans@avans.nl");
+                  results.password.should.be.a("string").that.equals("secret#f4Dtfeer");
+                  results.phoneNumber.should.be.a("string").that.equals("06 12425475");
+                done();
+              });
+          });
     })
     describe('TC 204-4 Gebruiker-ID bestaat niet', () => {
         //
@@ -467,8 +504,7 @@ describe('Meals API', () => {
             chai.request(server)
                 .post('/api/meal')
                 .send({
-                    // name is missing
-                    isActive: 1,
+                    isActive: true,
                     isVega: 1,
                     isVegan: 1,
                     isToTakeHome: 1,
@@ -485,12 +521,16 @@ describe('Meals API', () => {
                 )
                 .end((err, res) => {
                     assert.ifError(err)
+                    res.should.be.an("Object");
+                    let { status, results } = res.body;
                     res.should.have.status(201)
-                    res.should.be.an('object')
-
+                    results.name.should.be.a("string").that.equals("pannenkoeken");
+                    results.description.should.be.a("string").that.equals("met stroop");
+                    results.allergenes.should.be.a("string").that.equals("gluten");
+                    results.isActive.should.be.a("boolean").that.equals(true);
                     res.body.should.be
                         .an('object')
-                        .that.has.all.keys('statusCode', 'result')
+                        .that.has.all.keys('statusCode', 'results')
                     done()
                 })
         })
