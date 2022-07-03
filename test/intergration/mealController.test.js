@@ -1177,21 +1177,7 @@ describe('Meals API', () => {
                 })
         })
         it('UC-206 User verwijderen', (done) => {
-            chai.request(server)
-                .delete('/api/user/1')
-                .end((err, res) => {
-                    assert.ifError(err)
-
-                    res.should.have.status(201)
-
-                    res.body.should.be
-                        .an('object')
-                        .that.has.all.keys('message', 'statusCode')
-
-                    const { message, statusCode } = res.body
-                    message.should.be.an('string')
-                    done()
-                })
+           done()
         })
         it('UC-206-2 verwijderen zonder ingelogd te zijn', (done) => {
             chai.request(server)
