@@ -174,9 +174,10 @@ let userController = {
                     result: "User email bestaat al"
                   })
                 } else {
+                  let user = { id: results.insertId, ...req.body };
                   return res.status(201).json({
                     status: 201,
-                    results: req.body
+                    results: user
                 })
                 }
                 
@@ -296,7 +297,7 @@ let userController = {
                       dbconnection.getConnection(function (err, connection) {
                         if (err) throw err; // not connected!
                         console.log(param)
-                        
+                
                         let queryDetail = "DELETE FROM user WHERE user.id = " + param + ";"
                       
                         console.log(queryDetail)
@@ -332,57 +333,96 @@ let userController = {
                   })
               });
         },
-        updateUser(req, res, next)  {
-          let userReq = req.body;
-          let {
-            firstName,
-            lastName,
-            street,
-            city,
-            isActive,
-            emailAdress,
-            password,
-            phoneNumber,
-          } = userReq;
+        updateUser(req, res, next) {
+          logger.debug("userController: updateUser is called");
           dbconnection.getConnection(function (err, connection) {
-            //not connected
-            if (err)
-              throw res.status(400).json({
-                statusCode: 400,
-                Error: err,
+            if (err) {
+              next(err);
+            }
+            if (req.params.userId != req.userId) {
+              return res.status(400).json({
+                status: 400,
+                message: `User doesn't exists, or not authorized to update the user.`,
               });
+            } else {
+              connection.query(
+                "UPDATE user SET ? WHERE id = ?",
+                [req.body, req.params.userId],
+                function (error, results, fields) {
+                  connection.release();
+                  if (error) {
+                    next(error);
+                  }
       
-            // Use the connection
-            connection.query(
-              `UPDATE user SET firstName = '${firstName}', lastName = '${lastName}', street = '${street}', city = '${city}', isActive = ${isActive}, emailAdress = '${emailAdress}', password = '${password}', phoneNumber = '${phoneNumber}' WHERE id = ${req.params.userId}`,
-              function (error, results, fields) {
-                // When done with the connection, release it.
-                connection.release();
-                // Handle error after the release.
-                if (error) {
-                  console.log(error);
-                  return res.status(400).json({
-                    statusCode: 400,
-                    result: `Updating user failed.`,
-                  });
+                  if (results.affectedRows > 0) {
+                    updatedUser = req.body;
+                    res.status(200).json({
+                      status: 200,
+                      result: { id: req.params.userId, ...updatedUser },
+                    });
+                  } else {
+                    res.status(400).json({
+                      status: 400,
+                      message: `Can't find user with ID: ${req.params.userId}`,
+                    });
+                  }
                 }
-      
-                // succesfull query handlers
-                if (results.affectedRows > 0) {
-                  res.status(200).json({
-                    statusCode: 200,
-                    result: req.body,
-                  });
-                } else {
-                  res.status(400).json({
-                    statusCode: 400,
-                    result: `Updating user failed.`,
-                  });
-                }
-              }
-            );
-          })
+              );
+            }
+          });
         },
+      
+        // updateUser(req, res, next)  {
+        //   let userReq = req.body;
+        //   let {
+        //     firstName,
+        //     lastName,
+        //     street,
+        //     city,
+        //     isActive,
+        //     emailAdress,
+        //     password,
+        //     phoneNumber,
+        //   } = userReq;
+        //   dbconnection.getConnection(function (err, connection) {
+        //     //not connected
+        //     if (err)
+        //       throw res.status(400).json({
+        //         statusCode: 400,
+        //         Error: err,
+        //       });
+      
+        //     // Use the connection
+        //     connection.query(
+        //       `UPDATE user SET firstName = '${firstName}', lastName = '${lastName}', street = '${street}', city = '${city}', isActive = ${isActive}, emailAdress = '${emailAdress}', password = '${password}', phoneNumber = '${phoneNumber}' WHERE id = ${req.params.userId}`,
+        //       function (error, results, fields) {
+        //         // When done with the connection, release it.
+        //         connection.release();
+        //         // Handle error after the release.
+        //         if (error) {
+        //           console.log(error);
+        //           return res.status(400).json({
+        //             statusCode: 400,
+        //             result: `Updating user failed.`,
+        //           });
+        //         }
+      
+        //         // succesfull query handlers
+        //         if (results.affectedRows > 0) {
+        //           res.status(200).json({
+        //             statusCode: 200,
+        //             result: req.body,
+        //           });
+        //         } else {
+        //           res.status(400).json({
+        //             statusCode: 400,
+        //             result: `Updating user failed.`,
+        //           });
+        //         }
+        //       }
+        //     );
+        //   })
+        // },
 }
 module.exports = userController;
     

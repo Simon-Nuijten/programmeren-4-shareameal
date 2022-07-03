@@ -177,9 +177,10 @@ let mealController = {
                     message: error
                   })
                 } else {
+                  let meal = { id: results.insertId, ...req.body };
                   return res.status(201).json({
                     statusCode: 201,
-                    results: req.body
+                    results: meal
                 })
                 }
                 })
@@ -297,78 +298,76 @@ let mealController = {
                 })
             });
           },
-          updateMeal(req, res, next)  {
-            let param = req.params.mealId
+          updateMeal: (req, res, next) => {
+            logger.debug("mealController: updateMeal called.");
+            //format allergenes JSON to the right string for the query
+            const allergenes = req.body.allergenes;
+            let allergenesString = "";
+            for (let index = 0; index < allergenes.length; index++) {
+              allergenesString += allergenes[index] + ",";
+            }
+            if (allergenesString !== "") {
+              allergenesString = allergenesString.slice(0, -1);
+            }
+        
             let mealReq = req.body;
-            let {
-              isActive,
-              isVega,
-              isVegan,
-              isToTakeHome,
-              maxAmountOfParticipants,
-              price,
-              imageUrl,
-              cookid,
-              name,
-              description,
-              allergenes
-            } = mealReq;
+            mealReq.allergenes = allergenesString;
+            logger.debug("mealController: updateMeal --> altered mealReq.");
+            logger.debug(mealReq);
             dbconnection.getConnection(function (err, connection) {
-              if (err) throw err; // not connected!
-              console.log(param)
-              
-              let queryDetail = "SELECT * FROM meal WHERE meal.id = " + param + " AND meal.cookId = " + req.userId +  ";"
-            
-              console.log(queryDetail)
+              //not connected
+              if (err) {
+                next(err);
+              }
               connection.query(
-                queryDetail,
-                function (error, results, fields) {
-                  connection.release();
-    
-                  if (error) throw error;
-                  
-                  if (results.length>0){
-                     dbconnection.getConnection(function (err, connection) {
-              //not connected        
-              // Use the connection
-              connection.query(
-                `UPDATE meal SET isActive = '${isActive}', isVega = '${isVega}', isVegan = '${isVegan}', isToTakeHome = '${isToTakeHome}', dateTime = NOW(), maxAmountOfParticipants = '${maxAmountOfParticipants}', price = '${price}', imageUrl = '${imageUrl}', cookid = 1, createDate = NOW(), updateDate = NOW() , name = '${name}', description = '${description}' , allergenes = '${allergenes}' WHERE id = ${param}`,
+                "SELECT * FROM meal WHERE id = ?",
+                [req.params.mealId],
                 function (error, results, fields) {
                   // When done with the connection, release it.
                   connection.release();
                   // Handle error after the release.
                   if (error) {
-                    console.log(error);
-                    return res.status(400).json({
-                      statusCode: 408,
-                      result: `Updating meal failed.`,
+                    next(error);
+                  }
+                  if (results.length === 0) {
+                    return res.status(404).json({
+                      status: 404,
+                      message: `Meal doesn't exist.`,
                     });
                   }
-        
                   // succesfull query handlers
-                  if (results.affectedRows > 0) {
-                    res.status(200).json({
-                      statusCode: 200,
-                      result: req.body
+                  if (results[0].cookId != req.userId) {
+                    return res.status(403).json({
+                      status: 403,
+                      message: `Not authorized to update the meal.`,
                     });
                   } else {
-                    res.status(400).json({
-                      statusCode: 407,
-                      result: `Updating Meal failed.`,
-                    });
+                    // Use the connection
+                    connection.query(
+                      "UPDATE meal SET ? WHERE id = ?",
+                      [mealReq, req.params.mealId],
+                      function (error, results, fields) {
+                        // When done with the connection, release it.
+                        connection.release();
+        
+                        // Handle error after the release.
+                        if (error) {
+                          next(error);
+                        }
+        
+                        // succesfull query handlers
+                        if (results.affectedRows > 0) {
+                          let mealUpdated = req.body;
+                          res.status(200).json({
+                            status: 200,
+                            result: { id: req.params.mealId, ...mealUpdated },
+                          });
+                        }
+                      }
+                    );
                   }
                 }
               );
-            })
-                      
-                }else{
-                  res.status(404).json({
-                    statusCode: 404,
-                    message: 'This is not your meal',
-               })
-            
-                }
-                })
             });
           },
 }
