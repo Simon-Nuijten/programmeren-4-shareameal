@@ -280,7 +280,7 @@ let mealController = {
                         }else{
                           res.status(404).json({
                             statusCode: 404,
-                            message: 'There is no meal with this id!',
+                            message: 'Jij staat niet ingeschreven voor deze meal',
                        })
                     
                         }
