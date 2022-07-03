@@ -249,32 +249,88 @@ let userController = {
           });
         
         },
-      deleteUser(req, res, next)  {
-          const param = req.params.userId;
-          console.log(`User met ID ${userid} verwijdert`);
-          dbconnection.getConnection(function (err, connection) {
-            if (err) throw err; // not connected!
+      // deleteUser(req, res, next)  {
+      //     const param = req.params.userId;
+      //     console.log(`User met ID ${userid} verwijdert`);
+      //     dbconnection.getConnection(function (err, connection) {
+      //       if (err) throw err; // not connected!
           
-            connection.query(
-              "DELETE FROM user WHERE user.id = " + param + ";",
-              function (error, results, fields) {
-                connection.release();
+      //       connection.query(
+      //         "DELETE FROM user WHERE user.id = " + param + ";",
+      //         function (error, results, fields) {
+      //           connection.release();
 
-                if (results.affectedRows > 0){
-                  return res.status(200).json({
-                    statusCode: 200,
-                    results: "User deleted",
-                })
-              }
-                else {
-                  res.status(400).json({
-                    statusCode: 400,
-                    result: 'There is no user with this id!',
-               })
-                }
+      //           if (results.affectedRows > 0){
+      //             return res.status(200).json({
+      //               statusCode: 200,
+      //               results: "User deleted",
+      //           })
+      //         }
+      //           else {
+      //             res.status(400).json({
+      //               statusCode: 400,
+      //               result: 'There is no user with this id!',
+      //          })
+      //           }
                 
-              })
-          });
+      //         })
+      //     });
+      //   },
+        deleteUser(req, res, next)  {
+          const param = req.params.userId
+            dbconnection.getConnection(function (err, connection) {
+                if (err) throw err; // not connected!
+                console.log(param)
+                
+                let queryDetail = "SELECT * FROM user WHERE user.id = " + param + ";"
+              
+                console.log(queryDetail)
+                connection.query(
+                  queryDetail,
+                  function (error, results, fields) {
+                    connection.release();
+      
+                    if (error) throw error;
+                    
+                    if (results.length>0){
+                      dbconnection.getConnection(function (err, connection) {
+                        if (err) throw err; // not connected!
+                        console.log(param)
+                        
+                        let queryDetail = "DELETE FROM user WHERE user.id = " + param + ";"
+                      
+                        console.log(queryDetail)
+                        connection.query(
+                          queryDetail,
+                          function (error, results, fields) {
+                            connection.release();
+              
+                            if (error) throw error;
+                            
+                            if (results.affectedRows > 0){
+                              return res.status(200).json({
+                                statusCode: 200,
+                                results: "user deleted",
+                           })
+                          }else{
+                            res.status(404).json({
+                              statusCode: 404,
+                              message: 'There is no user with this id!',
+                         })
+                      
+                          }
+                          })
+                      });
+                        
+                  }else{
+                    res.status(404).json({
+                      statusCode: 404,
+                      message: 'This is not your account',
+                 })
+              
+                  }
+                  })
+              });
         },
         updateUser(req, res, next)  {
           let userReq = req.body;
