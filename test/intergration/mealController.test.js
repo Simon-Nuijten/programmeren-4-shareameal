@@ -648,7 +648,36 @@ describe('Meals API', () => {
         })
         // En hier komen meer testcases
     })
-    
+    it('TC 301-3 Update meal', (done) => {
+        chai.request(server)
+            .put('/api/meal/1')
+            .send({
+                isActive: true,
+                isVega: 1,
+                isVegan: 1,
+                isToTakeHome: 1,
+                maxAmountOfParticipants: 6,
+                price: 2.50,
+                imageUrl: 'hoppa.com',
+                cookId: 1,
+                name: 'pannenkoeken',
+                description: 'met stroop',
+                allergenes: 'gluten',
+            }).set(
+                'authorization',
+                'Bearer ' + jwt.sign({ userId: 1 }, jwtSecretKey)
+            )
+            .end((err, res) => {
+                assert.ifError(err)
+                res.should.be.an("Object");
+                let { status, results } = res.body;
+                res.should.have.status(200)
+                res.body.should.be
+                    .an('object')
+                    .that.has.all.keys('status', 'result')
+                done()
+            })
+    })
     describe('TC 302-2 update meal without login', () => {
         //
         beforeEach((done) => {
