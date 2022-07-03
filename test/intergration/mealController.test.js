@@ -466,10 +466,10 @@ describe('Meals API', () => {
 
                     res.body.should.be
                         .an('object')
-                        .that.has.all.keys('result', 'statusCode')
+                        .that.has.all.keys('status', 'message')
 
-                    const { statusCode, result } = res.body
-                    statusCode.should.be.an('number')
+                    const { status, message } = res.body
+                    status.should.be.an('number')
                     done()
                 })
         })
@@ -880,7 +880,7 @@ describe('Meals API', () => {
 
                     res.body.should.be
                         .an('object')
-                        .that.has.all.keys('statusCode', 'message')
+                        .that.has.all.keys('status', 'message')
                     done()
                 })
         })
