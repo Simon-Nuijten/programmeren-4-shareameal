@@ -646,7 +646,6 @@ describe('Meals API', () => {
                     done()
                 })
         })
-        // En hier komen meer testcases
     })
     it('TC 301-3 Update meal', (done) => {
         chai.request(server)
